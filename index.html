@@ -109,7 +109,6 @@
     </style>
 </head>
 <body class="min-h-screen">
-    <form action="https://formspree.io/f/mjkoqoya" method="POST">
     <div class="container mx-auto px-4 py-8 max-w-4xl">
         <!-- 首页 -->
         <div id="home-page" class="text-center">
@@ -234,7 +233,7 @@
         <p>Designed by 阿狸&边边</p>
     </footer>
 
-    <script>
+    <script id="survey-data" type="application/json">
         // 问卷数据
         const questions = [
             // 第1页
@@ -299,8 +298,8 @@
                 questionDiv.className = 'question-box';
                 
                 questionDiv.innerHTML = `
-                    <p class="question-text mb-3" name="question-text">${q}</p>
-                    <div class="option-grid" name="option-grid">
+                    <p class="question-text mb-3">${q}</p>
+                    <div class="option-grid">
                         <button class="option-btn px-4 py-2 rounded-full ${answers[questionIndex] === 1 ? 'selected' : ''}" data-index="${questionIndex}" data-value="1">非常讨厌</button>
                         <button class="option-btn px-4 py-2 rounded-full ${answers[questionIndex] === 2 ? 'selected' : ''}" data-index="${questionIndex}" data-value="2">一般无感</button>
                         <button class="option-btn px-4 py-2 rounded-full ${answers[questionIndex] === 3 ? 'selected' : ''}" data-index="${questionIndex}" data-value="3">比较喜欢</button>
@@ -592,6 +591,55 @@
             }
         });
     </script>
-    </form>
+    <script>
+        // 提取问卷数据
+        const surveyData = JSON.parse(document.getElementById('survey-data').textContent);
+
+        // 打印问卷数据，查看是否正确提取
+        console.log(surveyData);
+
+        // Formspree的表单提交URL
+        const formspreeEndpoint = 'https://formspree.io/f/{your-form-id}';
+
+        // 表单提交处理
+        document.getElementById('survey-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // 获取表单数据
+            const formData = new FormData(event.target);
+            const data = {};
+
+            // 将FormData转换成对象
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // 添加问卷问题及用户选择的答案
+            data.surveyQuestions = surveyData.questions.map(q => {
+                return {
+                    question: q.question,
+                    answer: data[q.id] || 'No answer'  // 获取用户选择的答案，如果没有填写则显示 'No answer'
+                };
+            });
+
+            // 使用Fetch发送JSON请求
+            fetch(formspreeEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(responseData => {
+                alert('Form submitted successfully!');
+                console.log(responseData);
+            })
+            .catch(error => {
+                alert('There was an error submitting the form.');
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
 </html>
