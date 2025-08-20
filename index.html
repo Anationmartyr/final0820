@@ -233,7 +233,7 @@
         <p>Designed by 阿狸&边边</p>
     </footer>
 
-    <script id="survey-data" type="application/json">
+    <script>
         // 问卷数据
         const questions = [
             // 第1页
@@ -589,56 +589,6 @@
             } else {
                 showResults();
             }
-        });
-    </script>
-    <script>
-        // 提取问卷数据
-        const surveyData = JSON.parse(document.getElementById('survey-data').textContent);
-
-        // 打印问卷数据，查看是否正确提取
-        console.log(surveyData);
-
-        // Formspree的表单提交URL
-        const formspreeEndpoint = 'https://formspree.io/f/mjkoqoya';
-
-        // 表单提交处理
-        document.getElementById('survey-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            // 获取表单数据
-            const formData = new FormData(event.target);
-            const data = {};
-
-            // 将FormData转换成对象
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-
-            // 添加问卷问题及用户选择的答案
-            data.surveyQuestions = surveyData.questions.map(q => {
-                return {
-                    question: q.question,
-                    answer: data[q.id] || 'No answer'  // 获取用户选择的答案，如果没有填写则显示 'No answer'
-                };
-            });
-
-            // 使用Fetch发送JSON请求
-            fetch(formspreeEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(responseData => {
-                alert('Form submitted successfully!');
-                console.log(responseData);
-            })
-            .catch(error => {
-                alert('There was an error submitting the form.');
-                console.error('Error:', error);
-            });
         });
     </script>
 </body>
