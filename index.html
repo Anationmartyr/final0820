@@ -557,29 +557,32 @@
                 document.getElementById('result-combo').classList.remove('hidden');
             }
         }
-        // 提交数据到 Formspree
-        function submitForm() {
-            const formData = new FormData();
-            formData.append('answers', JSON.stringify(answers));  // 将答案转为 JSON 格式
+// 提交数据到 Formspree
+function submitForm() {
+    // 创建一个包含答案的对象
+    const formData = {
+        answers: JSON.stringify(answers)  // 将答案数组转化为 JSON 字符串
+    };
 
-            // 使用 Fetch 提交到 Formspree
-            fetch('https://formspree.io/f/mjkoqoya', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert('感谢您的回答，我们已收到您的反馈！');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('提交失败，请稍后再试。');
-            });
-        }
+    // 使用 Fetch 提交到 Formspree
+    fetch('https://formspree.io/f/mjkoqoya', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',  // 设置内容类型为 JSON
+        },
+        body: JSON.stringify(formData),  // 将数据转化为 JSON 字符串
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        alert('感谢您的回答，我们已收到您的反馈！');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('提交失败，请稍后再试。');
+    });
+}
+
         // 事件监听
         startBtn.addEventListener('click', initSurvey);
         
