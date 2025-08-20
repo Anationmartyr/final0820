@@ -268,7 +268,7 @@
         // 用户答案
         const answers = Array(18).fill(0);
         let currentPage = 0;
-
+        let answers = {}; // 存储所有问题的答案
         // DOM元素
         const homePage = document.getElementById('home-page');
         const surveyPage = document.getElementById('survey-page');
@@ -557,31 +557,22 @@
                 document.getElementById('result-combo').classList.remove('hidden');
             }
         }
-// 提交数据到 Formspree
-function submitForm() {
-    // 创建一个包含答案的对象
-    const formData = {
-        answers: JSON.stringify(answers)  // 将答案数组转化为 JSON 字符串
-    };
+    // 提交表单
+    async function submitForm() {
+      const data = { answers };
 
-    // 使用 Fetch 提交到 Formspree
-    fetch('https://formspree.io/f/mjkoqoya', {
+      const resp = await fetch('https://formspree.io/f/mgvzjwyz', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',  // 设置内容类型为 JSON
-        },
-        body: JSON.stringify(formData),  // 将数据转化为 JSON 字符串
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-        alert('感谢您的回答，我们已收到您的反馈！');
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('提交失败，请稍后再试。');
-    });
-}
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (resp.ok) {
+        alert('提交成功！');
+      } else {
+        alert('提交失败，请稍后重试。');
+      }
+    }
 
         // 事件监听
         startBtn.addEventListener('click', initSurvey);
@@ -607,6 +598,13 @@ function submitForm() {
             }
             
             if (currentPage < questions.length - 1) {
+                // 获取当前页的答案
+      const pageQuestions = questions[currentPage];
+      pageQuestions.forEach((question, index) => {
+        const selectedOption = document.querySelector(`input[name="question${currentPage}_${index}"]:checked`);
+        if (selectedOption) {
+          answers[`question${currentPage}_${index}`] = selectedOption.value;
+            }}
                 currentPage++;
                 renderQuestions(currentPage);
                 updateProgress();
